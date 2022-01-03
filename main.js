@@ -4,11 +4,8 @@ const fsService = require('./services/fs.service');
 
 (async function () {
     try {
-        
         loggerService.info('Started')
-        const citiesWithLatLng = await weatherService.getLatLng()
-        const citiesForecasts = await weatherService.getForecasts(citiesWithLatLng)
-        const calculatedData = weatherService.calculateData(citiesForecasts)
+        const calculatedData = await weatherService.getForecastsStr()
         await fsService.writeFile('weather.csv', calculatedData)
     } catch (err) {
         loggerService.error(err)
