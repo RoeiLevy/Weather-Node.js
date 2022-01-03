@@ -11,7 +11,9 @@ const API_KEY = '21da4badb28db13dc72072bc45fb78d8'
 async function getForecastsStr() {
     try {
         const forecastsPromises = cities.map(async cityName => {
+            // Get the coordinates of the city.
             const coords = await _getLatLng(cityName)
+            // Get the forecast for the city.
             const forecast = await fetchData(`http://api.openweathermap.org/data/2.5/onecall?lat=${coords.lat}&lon=${coords.lon}&exclude=current,minutely,hourly&units=metric&appid=${API_KEY}`)
             forecast.cityName = cityName
             return forecast
@@ -37,7 +39,9 @@ async function _getLatLng(cityName) {
 
 // async function getForecastsStr() {
 //     try {
+//         // Get the coordinates of all the cities.
 //         const citiesWithLatLng = await _getLatLng()
+//         // Get the forecast for all the cities.
 //         const forecastsPromises = citiesWithLatLng.map(async city => {
 //             const { cityName, coords } = city
 //             const forecast = await fetchData(`http://api.openweathermap.org/data/2.5/onecall?lat=${coords.lat}&lon=${coords.lon}&exclude=current,minutely,hourly&units=metric&appid=${API_KEY}`)
@@ -65,27 +69,31 @@ async function _getLatLng(cityName) {
 // }
 
 function _calculateData(citiesForecasts) {
-    let dataStr = 'Day , city with highest temp, city with lowest temp, cities with rain\n'
-    for (var i = 0; i < daysCount; i++) {
+    let dataStr = 'Day , city with highest temp, city with lowest temp, cities with rain\n' // CSV header
+    for (var i = 0; i < daysCount; i++) { // for each day
+        // Setting variables for the day
         let highestTemp = -Infinity
         let lowestTemp = Infinity
         let highestTempCity, lowestTempCity = ''
         let rainCities = []
-        citiesForecasts.forEach(forecast => {
+        citiesForecasts.forEach(forecast => { // Check every city data on each day.
             const currDayForecast = forecast.daily[i]
             const maxTemp = currDayForecast.temp.max
             const minTemp = currDayForecast.temp.min
-            if (maxTemp > highestTemp) {
+            if (maxTemp > highestTemp) { // Check if the current city has the highest temp today.
                 highestTemp = maxTemp
                 highestTempCity = forecast.cityName
             }
-            if (minTemp < lowestTemp) {
+            if (minTemp < lowestTemp) { // Check if the current city has the lowest temp today.
                 lowestTemp = minTemp
                 lowestTempCity = forecast.cityName
             }
-            if (currDayForecast.rain) rainCities.push(forecast.cityName)
+            if (currDayForecast.rain) { // Check if the current city has rain today.
+                rainCities.push(forecast.cityName)
+            }
         })
 
+        // Add the current day data to the CSV string.
         dataStr += `Day ${new Date(citiesForecasts[0].daily[i].dt * 1000).toLocaleDateString()},${highestTempCity},${lowestTempCity},${rainCities.join(' & ')}\n`
     }
     return dataStr

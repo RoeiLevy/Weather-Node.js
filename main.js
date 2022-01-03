@@ -2,6 +2,8 @@ const weatherService = require('./services/weather.service')
 const loggerService = require('./services/logger.service')
 const fsService = require('./services/fs.service');
 
+// Run "npm run dev" to run the app in development mode(nodemon).
+
 (async function () {
     try {
         loggerService.info('Started')
